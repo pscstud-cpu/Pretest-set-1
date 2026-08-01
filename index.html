@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>नेपाल टेलिकम (NTC) / संस्थान विशेष - Model Exam Set 3 (50 MCQs)</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --secondary: #f4f6f9;
+            --success: #28a745;
+            --danger: #dc3545;
+            --dark: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary);
+            margin: 0;
+            padding: 15px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            font-size: 22px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .timer-box {
+            position: sticky;
+            top: 10px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #856404;
+            z-index: 100;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .user-info {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .user-info input {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0 16px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #exam-section {
+            display: none;
+        }
+
+        .q-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .q-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            white-space: pre-line;
+        }
+
+        .options label {
+            display: block;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .options label:hover {
+            background: #f1f1f1;
+        }
+
+        .options input {
+            margin-right: 10px;
+        }
+
+        .btn-start, .btn-submit-simple {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn-submit-simple {
+            background: var(--success);
+        }
+
+        .btn-start:hover {
+            background: #004085;
+        }
+
+        .btn-submit-simple:hover {
+            background: #218838;
+        }
+
+        #result-box {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #ffffff;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .pass { color: var(--success); font-weight: bold; font-size: 24px; }
+        .fail { color: var(--danger); font-weight: bold; font-size: 24px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🇳🇵 Nepal Telecom / Public Enterprises Model Exam - Set 3 (50 MCQs)</h1>
+
+    <!-- Registration Section -->
+    <div id="registration-section" class="user-info">
+        <h3>परीक्षार्थीको विवरण (Student Details):</h3>
+        <form id="startForm">
+            <label>पूरा नाम:</label>
+            <input type="text" id="userName" name="Name" required placeholder="तपाईंको नाम">
+            
+            <label>मोबाइल नम्बर:</label>
+            <input type="tel" id="userPhone" name="Phone" required placeholder="९८XXXXXXXX">
+            
+            <label>ठेगाना:</label>
+            <input type="text" id="userAddress" name="Address" required placeholder="जिल्ला / स्थानीय तह">
+
+            <button type="submit" class="btn-start">परीक्षा सुरु गर्नुहोस् (Start Exam)</button>
+        </form>
+    </div>
+
+    <!-- Exam Section -->
+    <div id="exam-section">
+        <div class="timer-box" id="timer">समय बाँकी: ५०:००</div>
+
+        <form id="quizForm">
+            <div id="questions-container"></div>
+
+            <!-- Hidden inputs for Formspree -->
+            <input type="hidden" id="hiddenName" name="Name">
+            <input type="hidden" id="hiddenPhone" name="Phone">
+            <input type="hidden" id="hiddenAddress" name="Address">
+            <input type="hidden" id="hiddenScore" name="Score">
+            <input type="hidden" id="hiddenStatus" name="Status">
+            <input type="hidden" id="hiddenBreakdown" name="Marks_Breakdown">
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit-simple">उत्तर बुझाउनुहोस् (Submit Exam)</button>
+        </form>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result-box"></div>
+</div>
+
+<script>
+    // Formspree URL राख्‍नुहोस् (उदा: https://formspree.io/f/xyzyvwpz)
+    const FORMSPREE_URL = "https://formspree.io/f/YOUR_FORM_ID";
+
+    const questions = [
+        // Section 1: General Knowledge (25 Questions)
+        { q: "१. विश्वको भूगोल अनुसार क्षेत्रफलका आधारमा भूपरिवेष्ठित (Landlocked) मुलुकहरूको ठूलोदेखि सानो क्रम कुन सही छ?", a: ["(A) मङ्गोलिया -> कजाखस्तान -> चाड -> नाइजर", "(B) कजाखस्तान -> मङ्गोलिया -> चाड -> नाइजर", "(C) कजाखस्तान -> चाड -> मङ्गोलिया -> नाइजर", "(D) चाड -> कजाखस्तान -> मङ्गोलिया -> नाइजर"], c: 1 },
+        { q: "२. विश्वको जलमण्डलको सबैभन्दा गहिरो भाग 'च्यालेन्जर्स डिप' (Challenger Deep) कुन ट्रेन्चमा अवस्थित छ?", a: ["(A) प्युर्टोरिको ट्रेन्च", "(B) जाभा ट्रेन्च", "(C) मारियाना ट्रेन्च", "(D) साउथ स्यान्डविच ट्रेन्च"], c: 2 },
+        { q: "३. भूमध्यरेखा (Equator) लाई दुई पटक काट्ने विश्वको नदी कुन हो?", a: ["(A) नाइल नदी", "(B) अमेजन नदी", "(C) कङ्गो नदी", "(D) लिम्पोपो नदी"], c: 2 },
+        { q: "४. स्थानीय सरकार सञ्चालन ऐन, २०७४ अनुसार नेपालका जिल्लाहरूलाई ५ भागमा वर्गीकरण गर्दा 'तराईका जिल्ला' अन्तर्गत कतिवटा जिल्लाहरू पर्दछन्?", a: ["(A) १८ वटा", "(B) २१ वटा", "(C) २८ वटा", "(D) ७ वटा"], c: 0 },
+        { q: "५. नेपालको प्रामाणिक समय निर्धारण गर्दा कुन हिमाल र देशान्तर रेखालाई आधार मानिएको छ?", a: ["(A) मनास्लु हिमाल (८६° १५' पूर्वी देशान्तर)", "(B) गौरीशङ्कर हिमाल (८६° १५' पूर्वी देशान्तर)", "(C) सगरमाथा (८४° १५' पूर्वी देशान्तर)", "(D) गौरीशङ्कर हिमाल (८५° १५' पूर्वी देशान्तर)"], c: 1 },
+        { q: "६. प्राचीन नेपालको इतिहासमा भूमिसम्बन्धी व्यवस्था अनुसार लिच्छविकालमा राजा तथा राज्यलाई बुझाउने कर (Tax) लाई के भनिन्थ्यो?", a: ["(A) भाग", "(B) भोग", "(C) कर", "(D) हिरण्य"], c: 0 },
+        { q: "७. मल्लकालीन इतिहासमा काठमाडौँका अन्तिम मल्ल राजा जयप्रकाश मल्लले जारी गरेको सबैभन्दा सानो मुद्रालाई के भनिन्छ?", a: ["(A) गुणाङ्क", "(B) जाभा", "(C) असर्फी", "(D) महेन्द्रमल्ली"], c: 1 },
+        { q: "८. नेपाल-अंग्रेज युद्ध (१८१४–१६) पश्चात् सन् १८१६ मार्च ४ मा भएको सुगौली सन्धिको कुन धाराले नेपालको सीमा निर्धारण गरेको थियो?", a: ["(A) धारा ३", "(B) धारा ५", "(C) धारा ७", "(D) धारा ९"], c: 1 },
+        { q: "९. प्रथम विश्वयुद्ध (१९१४–१९१८) को तत्कालिन कारण कुन घटनालाई मानिन्छ?", a: ["(A) जर्मनीद्वारा पोल्यान्डमाथि आक्रमण", "(B) अस्ट्रियाका राजकुमार फ्रान्सिस फर्डिनान्डको सेराजेभोमा हत्या", "(C) पर्ल हार्बरमा जापानी आक्रमण", "(D) भर्साइल सन्धिको उल्लङ्घन"], c: 1 },
+        { q: "१०. फ्रान्सको राज्यक्रान्ति (१७८९) को मुख्य नारा (Slogan) कुन थियो?", a: ["(A) समानता, भ्रातृत्व र न्याय", "(B) स्वतन्त्रता, समानता र भ्रातृत्व", "(C) स्वतन्त्रता, शान्ति र विकास", "(D) न्याय, धर्म र मानव अधिकार"], c: 1 },
+        { q: "११. संयुक्त राष्ट्रसङ्घ (UNO) को बडापत्रमा कतिवटा धारा र अध्यायहरू रहेका छन्?", a: ["(A) १०८ धारा, १८ अध्याय", "(B) १११ धारा, १९ अध्याय", "(C) १२१ धारा, २० अध्याय", "(D) ११५ धारा, १९ अध्याय"], c: 1 },
+        { q: "१२. संयुक्त राष्ट्रसङ्घको सुरक्षा परिषद् (UN Security Council) मा स्थायी (Permanent) र अस्थायी (Non-Permanent) गरी जम्मा कति सदस्य राष्ट्र हुन्छन्?", a: ["(A) १०", "(B) १५", "(C) २०", "(D) २५"], c: 1 },
+        { q: "१३. दक्षिण एसियाली क्षेत्रीय सहयोग सङ्गठन (SAARC) को बडापत्र (Charter) मा हस्ताक्षर कुन सम्मेलनमा र कहिले भएको थियो?", a: ["(A) प्रथम शिखर सम्मेलन (ढाका), १९८५ डिसेम्बर ८", "(B) दोस्रो शिखर सम्मेलन (बेङ्गलोर), १९८६ नोभेम्बर १६", "(C) तेस्रो शिखर सम्मेलन (काठमाडौँ), १९८७ नोभेम्बर ४", "(D) प्रथम शिखर सम्मेलन (नयाँ दिल्ली), १९८५ नोभेम्बर ८"], c: 0 },
+        { q: "१४. बिमस्टेक (BIMSTEC) को हालको संस्थागत संरचना अनुसार नेपालले कुन प्राथमिकता प्राप्त क्षेत्र (Priority Sector) को नेतृत्व गर्दछ?", a: ["(A) व्यापार, लगानी र विकास", "(B) संस्कृति, पर्यटन र जनस्तरको सम्बन्ध (People-to-People Contact)", "(C) गरिबी निवारण", "(D) वातावरण र जलवायु परिवर्तन"], c: 1 },
+        { q: "१५. नेपालले संयुक्त राष्ट्रसङ्घको सदस्यता कहिले प्राप्त गरेको थियो?", a: ["(A) सन् १९४५ अक्टोबर २४", "(B) सन् १९५५ डिसेम्बर १४", "(C) सन् १९६० जनवरी १", "(D) सन् १९५० डिसेम्बर १४"], c: 1 },
+        { q: "१६. नेपालको वर्तमान संविधान अनुसार नागरिकका मौलिक हकहरू संविधानको कुन भाग र धारामा व्यवस्था गरिएको छ?", a: ["(A) भाग २, धारा १० देखि १५", "(B) भाग ३, धारा १६ देखि ४६", "(C) भाग ४, धारा ४७ देखि ५५", "(D) भाग ३, धारा १५ देखि ४५"], c: 1 },
+        { q: "१७. नेपालको संविधान अनुसार राज्यका निर्देशक सिद्धान्त, नीति तथा दायित्वहरू संविधानको कुन भागमा उल्लेख छ?", a: ["(A) भाग ३", "(B) भाग ४", "(C) भाग ५", "(D) भाग ६"], c: 1 },
+        { q: "१८. नेपालको संविधान अनुसार सङ्घीय संसद (Federal Parliament) अन्तर्गत रहने प्रतिनिधि सभा र राष्ट्रिय सभामा क्रमशः कति सदस्य रहने व्यवस्था छ?", a: ["(A) २७५ र ५९", "(B) ३३० र ६०", "(C) २४० र ५९", "(D) २७५ र ६०"], c: 0 },
+        { q: "१९. नेपालको संविधान अनुसार संवैधानिक अङ्गको रूपमा रहेको 'लोक सेवा आयोग' मा अध्यक्षसहित बढीमा कति जना सदस्य रहने व्यवस्था छ?", a: ["(A) ५ जना", "(B) ६ जना", "(C) ७ जना", "(D) ९ जना"], c: 1 },
+        { q: "२०. नेपालको संविधान अनुसार सङ्घ, प्रदेश र स्थानीय तहको साझा अधिकारको सूची संविधानको कुन अनुसूचीमा राखिएको छ?", a: ["(A) अनुसूची ५", "(B) अनुसूची ७", "(C) अनुसूची ९", "(D) अनुसूची ८"], c: 2 },
+        { q: "२१. सूर्यबाट पृथ्वीसम्म प्रकाश आइपुग्न सामान्यतया कति समय लाग्छ?", a: ["(A) ५०० सेकेन्ड (लगभग ८ मिनेट २० सेकेन्ड)", "(B) ६०० सेकेन्ड (लगभग १० मिनेट)", "(C) ४०० सेकेन्ड (लगभग ६ मिनेट ४० सेकेन्ड)", "(D) ३०० सेकेन्ड (लगभग ५ मिनेट)"], c: 0 },
+        { q: "२२. मानव शरीरमा रक्तचाप (Blood Pressure) मापन गर्न कुन यन्त्र वा उपकरण प्रयोग गरिन्छ?", a: ["(A) ब्यारोमिटर", "(B) सिस्मोग्राफ", "(C) स्फिग्मोम्यानोमिटर", "(D) फेदोमिटर"], c: 2 },
+        { q: "२३. प्रकाशको परावर्तन र अपवर्तन (Refraction) को सिद्धान्तमा आधारित भई आँखाको लेन्स धमिलो हुने रोगलाई के भनिन्छ?", a: ["(A) मायोपिया (Myopia)", "(B) मोतिबिन्दु (Cataract)", "(C) ग्लुकोमा (Glaucoma)", "(D) हाइपरमेट्रोपिया (Hypermetropia)"], c: 1 },
+        { q: "२४. अल्बर्ट आइन्स्टाइन (Albert Einstein) लाई सन् १९२१ मा कुन खोजका लागि भौतिकशास्त्रतर्फको नोबेल पुरस्कार प्रदान गरिएको थियो?", a: ["(A) सापेक्षताको सिद्धान्त (Theory of Relativity)", "(B) फोटोइलेक्ट्रिक प्रभाव (Photoelectric Effect)", "(C) ब्राउनियन गति (Brownian Motion)", "(D) मास-एनर्जी समता (E=mc²)"], c: 1 },
+        { q: "२५. कम्प्युटर प्रविधिमा प्रयोग हुने 'RAM' को पूर्ण रूप (Full Form) के हो?", a: ["(A) Read Access Memory", "(B) Random Access Memory", "(C) Rapid Access Memory", "(D) Read Allocation Module"], c: 1 },
+
+        // Section 2: Public Enterprises, Management & Economy (20 Questions)
+        { q: "२६. हाल नेपालमा अस्तित्वमा रहेका सार्वजनिक संस्थानको संख्या कति छ?", a: ["(A) 42", "(B) 45", "(C) 48", "(D) 50"], c: 1 },
+        { q: "२७. सार्वजनिक संस्थानमध्ये सबैभन्दा बढी संस्था कुन क्षेत्रमा छन्?", a: ["(A) औद्योगिक", "(B) वित्तीय", "(C) सेवा", "(D) व्यापारिक"], c: 2 },
+        { q: "२८. व्यापारिक क्षेत्रमा सार्वजनिक संस्थानको संख्या कति छ?", a: ["(A) 4", "(B) 5", "(C) 6", "(D) 7"], c: 0 },
+        { q: "२९. वित्तीय क्षेत्रमा सार्वजनिक संस्थानको संख्या कति छ?", a: ["(A) 8", "(B) 9", "(C) 10", "(D) 11"], c: 2 },
+        { q: "३०. नेपाल आयल निगम लिमिटेड कुन मन्त्रालयअन्तर्गत पर्दछ?", a: ["(A) अर्थ मन्त्रालय", "(B) उद्योग, वाणिज्य तथा आपूर्ति मन्त्रालय", "(C) ऊर्जा मन्त्रालय", "(D) वन मन्त्रालय"], c: 1 },
+        { q: "३१. नेपाल विद्युत प्राधिकरण कुन क्षेत्रमा पर्दछ?", a: ["(A) वित्तीय", "(B) व्यापारिक", "(C) जनउपयोगी", "(D) सेवा"], c: 2 },
+        { q: "३२. सार्वजनिक संस्थानमध्ये सबैभन्दा बढी GDP योगदान गर्ने क्षेत्र कुन हो?", a: ["(A) वित्तीय", "(B) औद्योगिक", "(C) व्यापारिक", "(D) सामाजिक"], c: 2 },
+        { q: "३३. हाल सार्वजनिक संस्थानमध्ये खुद नाफामा रहेका संस्थाको संख्या कति छ?", a: ["(A) 22", "(B) 25", "(C) 27", "(D) 30"], c: 2 },
+        { q: "३४. हाल सार्वजनिक संस्थानमध्ये खुद नोक्सानीमा रहेका संस्थाको संख्या कति छ?", a: ["(A) 14", "(B) 16", "(C) 18", "(D) 20"], c: 1 },
+        { q: "३५. सञ्चित (Cumulative) नाफामा रहेका संस्थाको संख्या कति छ?", a: ["(A) 20", "(B) 21", "(C) 22", "(D) 23"], c: 2 },
+        { q: "३६. कार्यालयको प्राथमिक/आधारभूत कार्य अन्तर्गत कुन पर्छ?", a: ["(A) जनशक्ति व्यवस्थापन", "(B) सूचना/तथ्याङ्क प्राप्त गर्ने र सङ्कलन गर्ने", "(C) साधन स्रोतको संरक्षण", "(D) योजना निर्माण"], c: 1 },
+        { q: "३७. Open Office को मुख्य फाइदा कुन हो?", a: ["(A) पूर्ण गोपनीयता", "(B) सुपरिवेक्षणमा सहजता र कम लागत", "(C) हल्लामुक्त वातावरण", "(D) व्यक्तिगत कोठाको सुविधा"], c: 1 },
+        { q: "३८. अभिलेख व्यवस्थापनको चक्र (Record Management Life Cycle) को सही क्रम कुन हो?", a: ["(A) सिर्जना -> प्रयोग -> संरक्षण/भण्डारण वा धुल्याउने", "(B) प्रयोग -> सिर्जना -> धुल्याउने", "(C) धुल्याउने -> सिर्जना -> प्रयोग", "(D) सिर्जना -> धुल्याउने -> प्रयोग"], c: 0 },
+        { q: "३९. वैज्ञानिक व्यवस्थापनका पिता (Father of Scientific Management) भनेर कसलाई चिनिन्छ?", a: ["(A) Henri Fayol", "(B) F. W. Taylor", "(C) Max Weber", "(D) Elton Mayo"], c: 1 },
+        { q: "४०. निर्णय प्रक्रिया (Decision Making Process) को पहिलो चरण कुन हो?", a: ["(A) विकल्पहरूको पहिचान", "(B) समस्याको पहिचान र परिभाषा", "(C) श्रेष्ठ विकल्पको छनोट", "(D) निर्णयको कार्यान्वयन"], c: 1 },
+        { q: "४१. कुल गार्हस्थ्य उत्पादन (GDP) को संरचनामा कृषि क्षेत्रको योगदान कति प्रतिशत रहेको छ?", a: ["(A) ५६.० प्रतिशत", "(B) २४.० प्रतिशत", "(C) २१.४ प्रतिशत", "(D) ५.५ प्रतिशत"], c: 1 },
+        { q: "४२. वैदेशिक व्यापारको स्थिति अनुसार कुल वस्तु व्यापारमा निर्यातको अंश कति प्रतिशत रहेको छ?", a: ["(A) १२.९%", "(B) १४.८%", "(C) २०.८%", "(D) ११.२%"], c: 0 },
+        { q: "४३. नेपाल भ्रमण गर्ने पर्यटकहरूको मुख्य उद्देश्य कुन क्षेत्रमा बढी रहेको थियो?", a: ["(A) तीर्थयात्रा (१४.४%)", "(B) पदयात्रा/पर्वतारोहण (१४.२%)", "(C) बिदा/मनोरञ्जन (६०.२%)", "(D) व्यापारिक कार्य (११.२%)"], c: 2 },
+        { q: "४४. चालु आर्थिक वर्षको फागुनसम्म सडक विभाग मातहत बनेका नयाँ सडक निर्माणको लम्बाइ कति छ?", a: ["(A) ९१ किलोमिटर", "(B) ४१३ किलोमिटर", "(C) ६३.३ किलोमिटर", "(D) ७६ किलोमिटर"], c: 3 },
+        { q: "४५. हालको आर्थिक तथ्याङ्क अनुसार नेपालमा कुल विद्युत पहुँच कति प्रतिशत जनसङ्ख्यामा पुगेको छ?", a: ["(A) ९५.०%", "(B) ९९.१%", "(C) ८.६%", "(D) ९०.०%"], c: 1 },
+
+        // Section 3: Mathematics Solutions (5 Questions)
+        { q: "४६. एउटा संस्थाले रु. 400000 खुद नाफा गरेछ। यदि उसले आफ्ना 40 जना कर्मचारीहरूलाई खुद नाफाको 25% लाभांश वितरण गर्छ भने प्रत्येक कर्मचारीले कति रकम लाभांश पाउँछन्?", a: ["(A) Rs. 2500", "(B) Rs. 3000", "(C) Rs. 4500", "(D) Rs. 5000"], c: 0 },
+        { q: "४७. कुनै एउटा संख्या 1397 भन्दा 16% ठूलो र अर्को संख्या 2794 भन्दा 32% ठूलो छ भने पहिलो र दोस्रो संख्याको अनुपात कति होला?", a: ["(A) 33 : 29", "(B) 29 : 33", "(C) 29 : 66", "(D) 69 : 32"], c: 2 },
+        { q: "४८. 1 + 3 + 5 + 7 + ........ गरी 40 वटा पदहरूको योगफल पत्ता लगाउनुहोस्।", a: ["(A) 400", "(B) 800", "(C) 1200", "(D) 1600"], c: 3 },
+        { q: "४९. यदि 4 जना मानिसले 10 दिनमा रु. 28000 कमाउँछन् भने 3 जना मानिसले 15 दिनमा कति कमाउँछन्?", a: ["(A) Rs. 14000", "(B) Rs. 30000", "(C) Rs. 31500", "(D) Rs. 56000"], c: 2 },
+        { q: "५०. कति वर्षमा कुनै धनराशी वार्षिक 30% साधारण ब्याजदरले आफ्नै 16 गुणा हुन्छ?", a: ["(A) 30 वर्ष", "(B) 50 वर्ष", "(C) 40 वर्ष", "(D) 25 वर्ष"], c: 1 }
+    ];
+
+    let timerInterval;
+
+    document.getElementById('startForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        document.getElementById('hiddenName').value = document.getElementById('userName').value;
+        document.getElementById('hiddenPhone').value = document.getElementById('userPhone').value;
+        document.getElementById('hiddenAddress').value = document.getElementById('userAddress').value;
+
+        document.getElementById('registration-section').style.display = 'none';
+        document.getElementById('exam-section').style.display = 'block';
+        document.getElementById('timer').style.display = 'block';
+
+        renderQuestions();
+        startTimer();
+    });
+
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        questions.forEach((q, index) => {
+            let qHtml = `<div class="q-card"><div class="q-title">${q.q}</div><div class="options">`;
+            q.a.forEach((opt, optIndex) => {
+                qHtml += `<label><input type="radio" name="q${index}" value="${optIndex}"> ${opt}</label>`;
+            });
+            qHtml += `</div></div>`;
+            container.innerHTML += qHtml;
+        });
+    }
+
+    function startTimer() {
+        let timeLeft = 50 * 60;
+        const timerDisplay = document.getElementById('timer');
+        timerInterval = setInterval(() => {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            timerDisplay.innerHTML = `समय बाँकी: ${minutes}:${seconds}`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("समय सकियो! परीक्षा स्वत: सबमिट हुँदैछ।");
+                document.getElementById('quizForm').requestSubmit();
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearInterval(timerInterval);
+
+        let correctCount = 0;
+        let wrongCount = 0;
+        let skippedCount = 0;
+
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected) {
+                if (parseInt(selected.value) === q.c) {
+                    correctCount++;
+                } else {
+                    wrongCount++;
+                }
+            } else {
+                skippedCount++;
+            }
+        });
+
+        const positiveMarks = correctCount * 2;
+        const negativeMarks = wrongCount * 0.4;
+        let finalScore = positiveMarks - negativeMarks;
+        if (finalScore < 0) finalScore = 0;
+
+        const isPassed = finalScore >= 40;
+        const statusText = isPassed ? "PASS" : "FAIL";
+
+        document.getElementById('hiddenScore').value = `${finalScore.toFixed(1)} / 100`;
+        document.getElementById('hiddenStatus').value = statusText;
+        document.getElementById('hiddenBreakdown').value = `Correct: ${correctCount}, Wrong: ${wrongCount}, Skipped: ${skippedCount}`;
+
+        const formData = new FormData(this);
+
+        fetch(FORMSPREE_URL, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        }).finally(() => {
+            document.getElementById('quizForm').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+
+            const resultBox = document.getElementById('result-box');
+            resultBox.style.display = 'block';
+            
+            resultBox.innerHTML = `
+                <h2>परीक्षा नतिजा (Exam Result)</h2>
+                <p class="${isPassed ? 'pass' : 'fail'}">नतिजा: ${statusText}</p>
+                <hr>
+                <p><b>कुल प्राप्तांक (Total Marks):</b> ${finalScore.toFixed(1)} / 100</p>
+                <p><b>सही उत्तर (Correct):</b> ${correctCount} (+${positiveMarks} अंक)</p>
+                <p><b>गलत उत्तर (Wrong):</b> ${wrongCount} (-${negativeMarks.toFixed(1)} अंक)</p>
+                <p><b>छोडिएको (Skipped):</b> ${skippedCount} (० अंक)</p>
+            `;
+        });
+    });
+</script>
+
+</body>
+</html>
